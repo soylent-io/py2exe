@@ -15,7 +15,7 @@ import os, sys
 # _memimporter can be excluded because it is built into the run-stub.
 windows_excludes = """
 _curses
-_dummy_threading
+_dummy_threadingw
 _emx_link
 _gestalt
 _posixsubprocess
@@ -608,3 +608,10 @@ def hook__ssl(finder, module):
         for dll_path in glob.glob(os.path.join(sys.base_prefix, "DLLs", dll_search)):
             dll_name = os.path.basename(dll_path)
             finder.add_dll(dll_path)
+
+def hook_wx(finder, module):
+    depth = getattr(finder,"recursion_depth_wx_xml",0)
+    if depth==0:
+        finder.recursion_depth_wx_xml = depth + 1
+        finder.import_hook("wx.xml")
+        finder.recursion_depth_wx_xml = depth
