@@ -149,6 +149,7 @@ test_script:
   - runner numpy_test
   - runner pandas_test
   - runner tk_test
+  - runner wx_richtext_test
   - del "C:\Program Files\Amazon\AWSCLI\sqlite3.dll" /F
   - runner sqlite_test
   - runner certifi_test
