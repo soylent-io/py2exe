@@ -171,3 +171,9 @@ jobs:
           cd tests
           cd functional
           .\runner.ps1
+
+      - name: Publish jUnit
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: tests\functional\*.xml
