@@ -1,4 +1,9 @@
+. .\write_junit.ps1
+
 $testfailed = 0
+$MyResults = New-Object -TypeName "System.Collections.ArrayList"
+$header = @{ TestFileName = 'runner.ps1' }
+$out = Join-Path -Path $pwd -ChildPath "out.xml"
 
 Get-ChildItem -Recurse -Directory | ForEach-Object {
     $testname = $_.Name
@@ -22,9 +27,14 @@ Get-ChildItem -Recurse -Directory | ForEach-Object {
 
     if ($testfailed -ne 0) {
         Write-Host "$testname FAILED!!!"
+        $res = @{ Result = 'FAIL'; Test = $testname; Time = 28; Reason = $testfailed}
+        $MyResults.add($res)
         exit $testfailed
     }
 
+    $res = @{ Result = 'PASS'; Test = $testname; Time = 20; Reason = ''}
+    $MyResults.add($res)
     Write-Host "----------------- $testname PASS -------------------------"
 }
 
+Write-JunitXml $MyResults $header $out
