@@ -1,3 +1,5 @@
+# Credits: https://merill.net/2013/06/creating-junitxunit-compatible-xml-test-tesults-in-powershell/
+
 Function Write-JunitXml([System.Collections.ArrayList] $Results, [System.Collections.HashTable] $HeaderData, $ResultFilePath)
 {
 $template = @'

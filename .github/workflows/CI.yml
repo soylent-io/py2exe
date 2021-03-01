@@ -173,7 +173,8 @@ jobs:
           .\runner.ps1
 
       - name: Publish jUnit
-        uses: EnricoMi/publish-unit-test-result-action@v1
+        uses: EnricoMi/publish-unit-test-result-action@branch-composite-action-win
         if: always()
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           files: tests\functional\*.xml
