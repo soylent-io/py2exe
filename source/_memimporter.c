@@ -134,8 +134,6 @@ int do_import(FARPROC init_func, char *modname, PyObject *spec, PyObject **mod)
 
 #endif
 
-extern wchar_t dirname[]; // executable/dll directory
-
 static PyObject *
 import_module(PyObject *self, PyObject *args)
 {
@@ -165,42 +163,7 @@ import_module(PyObject *self, PyObject *args)
 
 	PyObject *m = PyModule_New(modname);
 
-	cookie = _My_ActivateActCtx(); // some windows manifest magic...
-	/*
-	 * The following problem occurs when we are a ctypes COM dll server
-	 * build with bundle_files == 1 which uses dlls that are not in the
-	 * library.zip. sqlite3.dll is such a DLL - py2exe copies it into the
-	 * exe/dll directory.
-	 *
-	 * The COM dll server is in some directory, but the client exe is
-	 * somewhere else.  So, the dll server directory is NOT on th default
-	 * dll search path.
-	 *
-	 * We use SetDllDirectory(dirname) to add the dll server directory to
-	 * the search path. Which works fine.  However, SetDllDirectory(NULL)
-	 * restores the DEFAULT dll search path; so it may remove directories
-	 * the the client has installed.  Do we have to call GetDllDirectory()
-	 * and save the result to be able to restore the path afterwards
-	 * again?
-	 *
-	 * Best would probably be to use AddDllDirectory / RemoveDllDirectory
-	 * but these are not even available by default on windows7...
-	 *
-	 * Are there other ways to allow loading of these dlls?  Application manifests?
-	 *
-	 * What about this activation context stuff?
-	 *
-	 * Note: py2exe 0.6 doesn't have this problem since it packs the
-	 * sqlite3.dll into the zip-archve when bundle_files == 1, but we want
-	 * to avoid that since it fails for other dlls (libiomp5.dll from
-	 * numpy is such an example).
-	 */
-	res = SetDllDirectoryW(dirname); // Add a directory to the search path
 	hmem = MyLoadLibrary(pathname, NULL, 0, findproc);
-	if (res)
-		SetDllDirectory(NULL); // restore the default dll directory search path
-	_My_DeactivateActCtx(cookie);
-
 	if (!hmem) {
 	        char *msg;
 		PyObject *error;
