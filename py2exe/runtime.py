@@ -421,7 +421,7 @@ class Runtime(object):
         # keys; we only need one of them in the archive.
         for mod in set(self.mf.modules.values()):
             if mod.__code__:
-                path =mod.__dest_file__
+                path = os.path.normpath(mod.__dest_file__)
                 stream = io.BytesIO()
                 stream.write(imp.get_magic())
                 if sys.version_info >= (3,7,0):
@@ -438,7 +438,7 @@ class Runtime(object):
                     continue
                 if self.options.bundle_files <= 2:
                     # put .pyds into the archive
-                    arcfnm = mod.__name__.replace(".", "\\") + EXTENSION_TARGET_SUFFIX
+                    arcfnm = mod.__name__.replace(".", os.path.sep) + EXTENSION_TARGET_SUFFIX
                     if self.options.verbose > 1:
                         print("Add %s to %s" % (os.path.basename(mod.__file__), libpath))
                     arc.write(mod.__file__, arcfnm)
@@ -455,9 +455,9 @@ class Runtime(object):
                     code = compile(loader, "<loader>", "exec",
                                    optimize=self.options.optimize)
                     if hasattr(mod, "__path__"):
-                        path = mod.__name__.replace(".", "\\") + "\\__init__" + bytecode_suffix
+                        path = mod.__name__.replace(".", os.path.sep) + os.path.sep + "__init__" + bytecode_suffix
                     else:
-                        path = mod.__name__.replace(".", "\\") + bytecode_suffix
+                        path = mod.__name__.replace(".", os.path.sep) + bytecode_suffix
                     stream = io.BytesIO()
                     stream.write(imp.get_magic())
                     if sys.version_info >= (3,7,0):
@@ -471,7 +471,7 @@ class Runtime(object):
         for name, src in self.mf.data_files_to_zip():
             if self.options.verbose > 1:
                 print("Add data file %s to %s" % (name, libpath))
-            arc.write(src, name)
+            arc.write(src, os.path.normpath(name))
 
         if self.options.bundle_files == 0:
             # put everything into the arc
